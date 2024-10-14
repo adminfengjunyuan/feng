@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>测速工具</title>
+  <style>
+    body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      background-color: #f5f5f5;
+    }
+
+    h1 {
+      text-align: center;
+    }
+
+    button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+
+    #speedResult {
+      font-size: 24px;
+      margin-top: 20px;
+    }
+
+    #historyList {
+      margin-top: 20px;
+      list-style-type: none;
+      padding: 0;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>网速测速工具</h1>
+  <button id="startButton">开始测速</button>
+  <div id="speedResult"></div>
+  <ul id="historyList"></ul>
+  <button id="clearButton">清除历史记录</button>
+  <script>
+    const startButton = document.getElementById('startButton');
+    const speedResult = document.getElementById('speedResult');
+    const historyList = document.getElementById('historyList');
+    const clearButton = document.getElementById('clearButton');
+
+    // 存储测速结果的数组，初始为空
+    let speedHistory = [];
+
+    startButton.addEventListener('click', async () => {
+      startButton.disabled = true;
+      const startTime = performance.now();
+      const response = await fetch('largeFile.dat'); // 假设存在一个大文件用于模拟下载
+      const endTime = performance.now();
+      const fileSizeInBytes = response.headers.get('content-length');
+      const durationInSeconds = (endTime - startTime) / 1000;
+      const speedInBytesPerSecond = fileSizeInBytes / durationInSeconds;
+      const speedInKbps = speedInBytesPerSecond / 1024;
+      const speedInMbps = speedInKbps / 1024;
+      speedResult.textContent = `网速约为 ${speedInMbps.toFixed(2)} Mbps`;
+
+      // 将测速结果添加到数组中
+      speedHistory.push(speedInMbps.toFixed(2));
+      // 更新历史记录显示
+      displayHistory();
+
+      startButton.disabled = false;
+    });
+
+    function displayHistory() {
+      historyList.innerHTML = '';
+      speedHistory.forEach(speed => {
+        const li = document.createElement('li');
+        li.textContent = `测速结果：${speed} Mbps`;
+        historyList.appendChild(li);
+      });
+    }
+
+    // 清除历史记录按钮的点击事件
+    clearButton.addEventListener('click', () => {
+      speedHistory = [];
+      displayHistory();
+    });
+  </script>
+</body>
+
+</html>
